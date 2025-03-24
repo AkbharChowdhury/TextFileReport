@@ -1,0 +1,8 @@
+# This file contains all kinds of data
+John
+0929384752
+JERry@gmail.com
+Luke
+AlanSmith@gmail.com
+Keith
+029302930
