@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 abstract public class ExtractorReport implements Cleanable {
 
     public abstract Pattern getPattern();
+
     public abstract String getReportName();
 
     @Override
@@ -16,25 +17,27 @@ abstract public class ExtractorReport implements Cleanable {
     }
 
 
-    private String parse(String filePath) throws FileNotFoundException{
+    private String parse(String filePath) throws FileNotFoundException {
         StringBuilder sb = new StringBuilder();
-        File file = new File(filePath);
-        Scanner scanner = new Scanner(file);
-        if (!scanner.hasNextLine()) return "Empty file";
-        scanner.nextLine();
-        while (scanner.hasNext()){
-            String nextLine = scanner.nextLine();
-            Matcher matcher = getPattern().matcher(nextLine);
-            boolean hasPatternMatched = matcher.matches();
-            if (hasPatternMatched){
-                sb.append(clean(nextLine)).append("\t");
+        try (var scanner = new Scanner(new File(filePath))) {
+            if (!scanner.hasNextLine()) return "Empty file";
+            scanner.nextLine();
+            while (scanner.hasNext()) {
+                String nextLine = scanner.nextLine();
+                Matcher matcher = getPattern().matcher(nextLine);
+                boolean hasPatternMatched = matcher.matches();
+                if (hasPatternMatched) {
+                    sb.append(clean(nextLine)).append(System.lineSeparator());
+                }
             }
+
         }
         String report = sb.toString();
-        return report.isBlank() ? "Empty file": report;
+        return report.isBlank() ? "Empty file" : report;
 
 
     }
+
     public void prepareAndSendReport(String filePath) throws FileNotFoundException {
         System.out.println(MessageFormat.format("Starting report {0}...", getReportName()));
         String report = parse(filePath);
